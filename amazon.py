@@ -124,9 +124,4 @@ diz_product_DB = dict(Luca.select_query(db, "product", "product_name, product_ID
 Luca.insert_N_N(db, "category_products", "product_ID, category_ID", lista_completa, diz_category_DB, 2, diff_value=True)
 Luca.insert_query(db, "rating", "rating, rating_count, product_ID", rating_list)
 
-
-#MACERTO
-
-
-
-
+#Deny Deny Deny
