@@ -1,6 +1,5 @@
 import csv
-import pprint
-import Database_Luca as Luca
+import Amazon.Database_Luca as Luca
 
 
 input_path = 'C:/Users/Luca/OneDrive/Documenti/Data_Engineer/Francesco/lezione file csv/amazon.csv'
@@ -122,7 +121,7 @@ Luca.insert_query(db, "product", "product_ID, product_name, description, img_lin
 diz_category_DB = dict(Luca.select_query(db, "category", "category_names, category_ID"))
 diz_product_DB = dict(Luca.select_query(db, "product", "product_name, product_ID"))
 
-Luca.insert_N_N(db, "category_products", "product_ID, category_ID", lista_completa, diz_category_DB, 2)
+Luca.insert_N_N(db, "category_products", "product_ID, category_ID", lista_completa, diz_category_DB, 2, diff_value=True)
 Luca.insert_query(db, "rating", "rating, rating_count, product_ID", rating_list)
 
 
