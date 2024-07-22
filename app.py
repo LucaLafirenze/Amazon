@@ -1,6 +1,6 @@
 from flask import Flask, request, redirect, render_template, url_for
 import json
-from backend import amazon as data
+# import amazon as data
 # import sys
 # import os
 
@@ -10,10 +10,10 @@ from backend import amazon as data
 
 app = Flask(__name__)
 
-@app.route('/products')
-def products():
-    categories = data.get_categories()
-    return render_template('products.html', categories=categories)
+# @app.route('/products')
+# def products():
+#     categories = data.get_categories()
+#     return render_template('products.html', categories=categories)
 
 @app.route('/')
 def index():
