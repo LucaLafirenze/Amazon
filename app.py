@@ -1,15 +1,18 @@
 from flask import Flask, request, redirect, render_template, url_for
 import json
-# import amazon as data
-# import sys
-# import os
-
-# external_module_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'backend'))
-# if external_module_path not in sys.path:
-#     sys.path.append(external_module_path)
+from config import Config
+import mysql.connector
 
 app = Flask(__name__)
 
+def connect_to_database():
+    connection = mysql.connector.connect(
+        host=Config.DATABASE_HOST,
+        user=Config.DATABASE_USER,
+        password=Config.DATABASE_PASSWORD,
+        database=Config.DATABASE_NAME
+    )
+    return connection
 # @app.route('/products')
 # def products():
 #     categories = data.get_categories()
@@ -18,6 +21,8 @@ app = Flask(__name__)
 @app.route('/')
 def index():
     return render_template('index.html')
+
+
 
 # # Carica i dati dei prodotti dal file JSON
 # with open('static/products.json') as f:
