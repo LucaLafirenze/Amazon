@@ -1,8 +1,8 @@
 import csv
-import Amazon.Database_Luca as Luca
+import Database_Luca as Luca
 
 
-input_path = 'C:/Users/Luca/OneDrive/Documenti/Data_Engineer/Francesco/lezione file csv/amazon.csv'
+input_path = 'amazon.csv'
 
 with open(input_path, encoding="utf-8") as f:
     lettura = csv.reader(f, delimiter=",")
@@ -114,6 +114,7 @@ c_fk = {
 Luca.crea_tabelle_FK(db, "category_products", "cat_product_ID", colonne_FK=c_fk)
 
 insert_tuple = tuple(category_set)
+price_list = tuple(price_list)
 Luca.insert_query(db, "category", "category_names", insert_tuple)
 Luca.insert_query(db, "price", "discount_price, actual_price, discount_percentage", price_list)
 Luca.insert_query(db, "product", "product_ID, product_name, description, img_link, product_link, price_ID", product_list)

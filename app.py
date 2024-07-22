@@ -1,4 +1,4 @@
-from flask import Flask, request, redirect, render_template, url_for
+from flask import Flask, request, redirect, render_template, url_for, jsonify
 import json
 from config import Config
 import mysql.connector
@@ -13,16 +13,24 @@ def connect_to_database():
         database=Config.DATABASE_NAME
     )
     return connection
-# @app.route('/products')
-# def products():
-#     categories = data.get_categories()
-#     return render_template('products.html', categories=categories)
+@app.route('/products')
+def products():
+    categories = get_categories().get_json()
+    return render_template('products.html', categories=categories)
 
 @app.route('/')
 def index():
     return render_template('index.html')
 
-
+@app.route("/data/categories")
+def get_categories():
+    connection = connect_to_database()
+    cursor = connection.cursor(dictionary=True)
+    cursor.execute("SELECT * FROM category")
+    categories = cursor.fetchall()
+    cursor.close()
+    connection.close()
+    return jsonify(categories)
 
 # # Carica i dati dei prodotti dal file JSON
 # with open('static/products.json') as f:
