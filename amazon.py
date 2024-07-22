@@ -125,7 +125,7 @@ Luca.insert_N_N(db, "category_products", "product_ID, category_ID", lista_comple
 Luca.insert_query(db, "rating", "rating, rating_count, product_ID", rating_list)
 
 
-
+#MACERTO
 
 
 
