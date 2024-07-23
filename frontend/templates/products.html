@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Amazon</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <style>
+        .card-img-top {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+        .card {
+            height: 100%;
+        }
+        .card-body {
+            display: flex;
+            flex-direction: column;
+        }
+        .card-title {
+            flex-grow: 1;
+        }
+    </style>
+  </head>
+
+  <body>
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg bg-body-tertiary">
+        <div class="container-fluid">
+          <a class="navbar-brand" href="#">Amazon</a>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+          <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+              <li class="nav-item">
+                <a class="nav-link active" aria-current="page" href="{{ url_for('index') }}">Home</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="{{ url_for('products') }}">Products</a>
+              </li>
+              <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                  Dropdown
+                </a>
+                <ul class="dropdown-menu">
+                  <li><a class="dropdown-item" href="#">Action</a></li>
+                  <li><a class="dropdown-item" href="#">Another action</a></li>
+                  <li><hr class="dropdown-divider"></li>
+                  <li><a class="dropdown-item" href="#">Something else here</a></li>
+                </ul>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link disabled" aria-disabled="true">Profile</a>
+              </li>
+            </ul>
+            <form class="d-flex" role="search">
+              <input class="form-control me-2" type="search" placeholder="Enter Product ID" aria-label="Search">
+              <button class="btn btn-outline-success" type="submit">Search</button>
+            </form>
+          </div>
+        </div>
+      </nav>
+    
+    
+    <!-- cards products -->
+    <div class="container mt-5 text-center">
+        <div class="container d-flex">
+          <div class="container ml-5">
+            <div class="sidebar d-none d-lg-block">
+                <h2>Categories</h2>
+                <ul class="mt-4">
+                    {% for category in categories %}
+                        <h6><a href="#">{{ category }}</a></h6>
+                    {% endfor %}
+                </ul>
+            </div>
+          </div>
+            <div class="main-content">
+                <div class="row">
+                    <h1 class="text-center">All Products</h1>
+
+                    {% for elem in products %}
+                    
+                      <div class="col-md-4 mb-4">
+                          <div class="card">
+                              <div class="card-body">
+                                  <img src="{{ elem[4] }}" class="card-img-top">
+                                  <h5 class="card-title">{{ elem[2] }}</h5>
+                                  <p> {{ elem[0] }} </p>
+                                  <p class="card-text">{{ elem[3] }}</p>
+                              </div>
+                          </div>
+                      </div>
+                      {% endfor %}
+                      
+                  </div>
+            </div>
+        </div>
+    </div>
+    
+
+    
+  </body>
+</html>
