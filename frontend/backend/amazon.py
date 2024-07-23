@@ -143,65 +143,50 @@ Luca.insert_N_N(db, "category_products", "product_ID, category_ID", lista_comple
 Luca.insert_query(db, "rating", "rating, rating_count, product_ID", rating_list)
 
 
-
 def get_categories(db):
     cursor = db.cursor()
-    # Query to get categories
     cursor.execute("SELECT DISTINCT category_names FROM category")
     categories = [row[0] for row in cursor.fetchall()]
-    # Close the db
     cursor.close()
     return categories
 
 
 def get_products_name(db):
-    # Connect to your database
     cursor = db.cursor()
-    # Query to get products
     cursor.execute("SELECT product_name FROM product")
     product_name = cursor.fetchall()
-    # Close the db
     cursor.close()
     return product_name
 
 
 def get_rating(db):
-    # Connect to your database
     cursor = db.cursor()
-    # Query to get products
     cursor.execute("SELECT rating FROM rating")
     products = cursor.fetchall()
-    # Close the db
     cursor.close()
     return products
 
 
 def get_product_img_link(db):
-    # Connect to your database
     cursor = db.cursor()
-    # Query to get products
     cursor.execute("SELECT img_link FROM product")
     product_img_link = cursor.fetchall()
-    # Close the db
     cursor.close()
     return product_img_link
 
 
 def get_product_description(db):
-    # Connect to your database
     cursor = db.cursor()
-    # Query to get products
     cursor.execute("SELECT description FROM product")
     product_description = cursor.fetchall()
-    # Close the db
     cursor.close()
     return product_description
 
 
 def get_products(db):
     products = []
+    cursor = db.cursor()
     try:
-        cursor = db.cursor()
         cursor.execute("SELECT * FROM product")
         products = cursor.fetchall()
     except mysql.connector.Error as err:
