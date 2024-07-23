@@ -120,8 +120,17 @@ colonne = {
     "password": "VARCHAR"
 }
 Luca.crea_tabelle(db, "utente_amazon", "utente_ID", colonne_aggiuntive=colonne)
+colonne = {
+    "like_boolean": "BOOLEAN"
+}
+Luca.crea_tabelle(db, "likes", "like_ID", colonne_aggiuntive=colonne)
 
+colonne_fk = {
+    "utente_ID": ("INT", "utente_amazon", "utente_ID"),
+    "like_ID": ("INT", "likes", "like_ID")
 
+}
+Luca.crea_tabelle(db, "utente_likes", "utente_likes_ID", colonne_FK=colonne_fk)
 insert_tuple = tuple(category_set)
 Luca.insert_query(db, "category", "category_names", insert_tuple)
 Luca.insert_query(db, "price", "discount_price, actual_price, discount_percentage", price_list)

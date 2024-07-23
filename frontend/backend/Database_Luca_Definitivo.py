@@ -97,6 +97,8 @@ def crea_tabelle(db, tabella_name, colonna_ID, colonne_FK=None, colonne_aggiunti
                 query += f", {colonna} TINYTEXT NOT NULL"
             elif tipo == 'TEXT':
                 query += f", {colonna} TEXT NOT NULL"
+            elif tipo == 'BOOLEAN':
+                query += f", {colonna} BOOLEAN NOT NULL"
 
     if colonne_FK:
         for chiave, valore in colonne_FK.items():
