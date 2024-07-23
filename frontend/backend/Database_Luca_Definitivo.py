@@ -1,6 +1,7 @@
 from tkinter import messagebox
 import re
 import mysql.connector
+from mysql.connector import errorcode
 
 
 def create_database(host, user, password, database_name):
@@ -33,59 +34,24 @@ def create_database(host, user, password, database_name):
                                                           "o a connettersi al database")
 
 
-def connect_database(host, utente, password, database_name):
-    db = mysql.connector.connect(
-        host=host,
-        user=utente,
-        password=password,
-        database=database_name,
-    )
-    return db
-
-
-def crea_tabelle(db, tabella_name, colonna_ID, colonne_aggiuntive=None, tipo_ID=None, Auto_I=None):
-    cursor = db.cursor()
-
-    if tipo_ID == "VARCHAR":
-        query = f"""
-            CREATE TABLE IF NOT EXISTS {tabella_name} (
-            {colonna_ID} {tipo_ID}(255) PRIMARY KEY
-            """
-    else:
-        tipo_ID = "INT"
-        query = f"""
-            CREATE TABLE IF NOT EXISTS {tabella_name} (
-            {colonna_ID} {tipo_ID} AUTO_INCREMENT PRIMARY KEY
-            """
-    if Auto_I is not None:
-        tipo_ID = "INT"
-        query = f"""
-            CREATE TABLE IF NOT EXISTS {tabella_name} (
-            {colonna_ID} {tipo_ID} PRIMARY KEY
-            """
-
-    if colonne_aggiuntive:
-        for colonna, tipo in colonne_aggiuntive.items():
-            if tipo == 'INT':
-                query += f", {colonna} INT NOT NULL"
-            elif tipo == 'FLOAT':
-                query += f", {colonna} FLOAT NOT NULL"
-            elif tipo == 'VARCHAR':
-                query += f", {colonna} VARCHAR(255) NOT NULL"
-            elif tipo == 'DATE':
-                query += f", {colonna} DATE NOT NULL"
-            elif tipo == 'TINYTEXT':
-                query += f", {colonna} TINYTEXT NOT NULL"
-            elif tipo == 'TEXT':
-                query += f", {colonna} TEXT NOT NULL"
-            elif tipo == 'CHAR':
-                query += f", {colonna} CHAR(1) NOT NULL"
-
-    query += ")"
-
-    cursor.execute(query)
-    db.commit()
-    cursor.close()
+@staticmethod
+def connect_database(host, user, password, database):
+    try:
+        db = mysql.connector.connect(
+            host=host,
+            user=user,
+            password=password,
+            database=database
+        )
+        return db
+    except mysql.connector.Error as err:
+        if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
+            print("dati non corretti")
+        elif err.errno == errorcode.ER_BAD_DB_ERROR:
+            print("Database non esiste")
+        else:
+            print(err)
+        return None
 
 
 def truncate(db, tabella_name):
@@ -96,7 +62,7 @@ def truncate(db, tabella_name):
     cursor.close()
 
 
-def crea_tabelle_FK(db, tabella_name, colonna_ID, colonne_FK, colonne_aggiuntive=None, tipo_ID=None, Auto_I=None):
+def crea_tabelle(db, tabella_name, colonna_ID, colonne_FK=None, colonne_aggiuntive=None, tipo_ID=None, Auto_I=None):
     cursor = db.cursor()
 
     if tipo_ID == "VARCHAR":
@@ -106,16 +72,16 @@ def crea_tabelle_FK(db, tabella_name, colonna_ID, colonne_FK, colonne_aggiuntive
             """
     else:
         tipo_ID = "INT"
-        query = f"""
-            CREATE TABLE IF NOT EXISTS {tabella_name} (
-            {colonna_ID} {tipo_ID} AUTO_INCREMENT PRIMARY KEY
-            """
-    if Auto_I is not None:
-        tipo_ID = "INT"
-        query = f"""
-            CREATE TABLE IF NOT EXISTS {tabella_name} (
-            {colonna_ID} {tipo_ID} PRIMARY KEY
-            """
+        if Auto_I is not None:
+            query = f"""
+                CREATE TABLE IF NOT EXISTS {tabella_name} (
+                {colonna_ID} {tipo_ID} PRIMARY KEY
+                """
+        else:
+            query = f"""
+                CREATE TABLE IF NOT EXISTS {tabella_name} (
+                {colonna_ID} {tipo_ID} AUTO_INCREMENT PRIMARY KEY
+                """
 
     if colonne_aggiuntive:
         for colonna, tipo in colonne_aggiuntive.items():
@@ -199,7 +165,7 @@ def insert_N_N(db, tabella_name, colonne, lista, elem_dict, n, diff_value=None):
     insert_query(db, tabella_name, colonne, sub_tuple_elem)
 
 
-def insert_images(db, tabella_name, values):
+def insert_urls(db, tabella_name, values):
 
     cursor = db.cursor()
 

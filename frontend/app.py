@@ -2,6 +2,7 @@ from flask import Flask, request, redirect, render_template, url_for
 import json
 from backend import amazon as data
 import mysql.connector
+import Amazon.frontend.backend.Database_Luca_Definitivo as Luca
 
 
 # SELECT p.*, r.rating FROM product p JOIN rating r ON p.product_ID = r.product_ID
@@ -14,6 +15,7 @@ import mysql.connector
 #     sys.path.append(external_module_path)
 
 app = Flask(__name__)
+db = Luca.connect_database("localhost", "root", "", "amazon")
 
 @app.route('/products')
 def products():
@@ -23,10 +25,10 @@ def products():
     category = request.args.get('category')
     filtro = []
 
-    for elem in data.get_products():
+    for elem in data.get_products(db):
         products_list.append(elem)
 
-    for elem in data.get_rating():
+    for elem in data.get_rating(db):
         rating_list.append(elem)
 
     if rating:
@@ -41,9 +43,7 @@ def products():
             nuova_tupla = t1 + t2
             risultato.append(nuova_tupla)
 
-    categories = data.get_categories()
-
-
+    categories = data.get_categories(db)
     return render_template('products.html', categories=categories, rating_list=rating_list, products=risultato, rating=rating, filtro=filtro)
 
 @app.route('/products2')
@@ -87,6 +87,7 @@ def products2():
     cnx.close()
 
     return render_template('products.html', categories=categories, products=risultato, rating=rating, filtro=filtro)
+
 
 @app.route('/')
 def index():
