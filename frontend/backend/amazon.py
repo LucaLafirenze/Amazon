@@ -131,6 +131,15 @@ colonne_fk = {
 
 }
 Luca.crea_tabelle(db, "utente_likes", "utente_likes_ID", colonne_FK=colonne_fk)
+
+colonne_fk = {
+    "utente_ID": ("INT", "utente_amazon", "utente_ID"),
+    "product_ID": ("VARCHAR", "product", "product_ID")
+
+}
+Luca.crea_tabelle(db, "utente_product", "utente_product_ID", colonne_FK=colonne_fk)
+
+
 insert_tuple = tuple(category_set)
 Luca.insert_query(db, "category", "category_names", insert_tuple)
 Luca.insert_query(db, "price", "discount_price, actual_price, discount_percentage", price_list)

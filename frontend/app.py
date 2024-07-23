@@ -1,4 +1,4 @@
-from flask import Flask, request, redirect, render_template, url_for
+from flask import Flask, request, redirect, render_template, url_for, session
 import json
 from backend import amazon as data
 import mysql.connector
@@ -16,6 +16,7 @@ import Amazon.frontend.backend.Database_Luca_Definitivo as Luca
 
 app = Flask(__name__)
 db = Luca.connect_database("localhost", "root", "", "amazon")
+
 
 @app.route('/products')
 def products():
@@ -46,7 +47,19 @@ def products():
     categories = data.get_categories(db)
     return render_template('products.html', categories=categories, rating_list=rating_list, products=risultato, rating=rating, filtro=filtro)
 
-@app.route('/products2')
+
+@app.route('/like/<int:product_id>', methods=['POST'])
+def like(product_id):
+    liked_products = session.get('liked_products', [])
+    if product_id in liked_products:
+        liked_products.remove(product_id)
+    else:
+        liked_products.append(product_id)
+    session['liked_products'] = liked_products
+    return '', 204  # Nessun contenuto da restituire
+
+
+"""@app.route('/products2')
 def products2():
     rating = request.args.get('rating')
     category = request.args.get('category')
@@ -86,7 +99,7 @@ def products2():
     cursor.close()
     cnx.close()
 
-    return render_template('products.html', categories=categories, products=risultato, rating=rating, filtro=filtro)
+    return render_template('products.html', categories=categories, products=risultato, rating=rating, filtro=filtro)"""
 
 
 @app.route('/')
