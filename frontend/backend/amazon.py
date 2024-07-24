@@ -203,3 +203,24 @@ def get_products(db):
     finally:
         cursor.close()
     return products
+
+
+def login_signup(db, username, password):
+    cursor = db.cursor()
+    try:
+        query = "INSERT INTO utente_amazon (username, password) VALUES (%s, %s)"
+        data = (username, password)
+        data = tuple(data)
+        print(data)
+        cursor.execute(query, data)
+        db.commit()
+    except mysql.connector.Error as e:
+        print(e)
+    finally:
+        cursor.close()
+
+
+
+"""def login_signup(db, username, password):
+    data = username, password
+    Luca.insert_query(db, "utente_amazon", "username, password", data)"""

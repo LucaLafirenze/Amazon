@@ -1,5 +1,7 @@
 from flask import Flask, request, redirect, render_template, url_for, session
 import json
+
+from Amazon.frontend.backend.amazon import login_signup
 from backend import amazon as data
 import mysql.connector
 import Amazon.frontend.backend.Database_Luca_Definitivo as Luca
@@ -23,7 +25,6 @@ def products():
     products_list = []
     rating_list = []
     rating = request.args.get('rating')
-    category = request.args.get('category')
     filtro = []
 
     for elem in data.get_products(db):
@@ -59,49 +60,6 @@ def like(product_id):
     return '', 204  # Nessun contenuto da restituire
 
 
-"""@app.route('/products2')
-def products2():
-    rating = request.args.get('rating')
-    category = request.args.get('category')
-    filtro = []
-
-    # Establishing the database connection
-    cnx = mysql.connector.connect(user='root', password='',
-                                  host='localhost', database='amazon')
-    cursor = cnx.cursor()
-
-    # Base query
-    query = "SELECT p.*, r.rating FROM product p JOIN rating r ON p.product_ID = r.product_ID"
-    conditions = []
-    params = []
-
-    # Adding conditions based on query parameters
-    if rating:
-        conditions.append("r.rating > %s")
-        params.append(rating)
-        filtro.append(f"Rating: {rating}")
-
-    if category:
-        conditions.append("p.category = %s")
-        params.append(category)
-        filtro.append(f"Category: {category}")
-
-    if conditions:
-        query += " WHERE " + " AND ".join(conditions)
-
-    cursor.execute(query, params)
-    risultato = cursor.fetchall()
-
-    # Fetching all categories for the filter dropdown
-    cursor.execute("SELECT DISTINCT category FROM product")
-    categories = cursor.fetchall()
-
-    cursor.close()
-    cnx.close()
-
-    return render_template('products.html', categories=categories, products=risultato, rating=rating, filtro=filtro)"""
-
-
 @app.route('/')
 def index():
     return render_template('index.html')
@@ -123,6 +81,16 @@ def index():
 @app.route('/login')
 def login():
     return render_template('login.html')
+
+
+@app.route('/to_signup', methods=['POST'])
+def signup():
+    username = request.form["username"]
+    password = request.form["password"]
+    login_signup(db, username, password)
+
+    return "dati inseriti"
+
 
 
 if __name__ == '__main__':
