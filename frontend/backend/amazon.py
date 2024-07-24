@@ -2,10 +2,10 @@ import csv
 
 import mysql.connector
 
-import Amazon.frontend.backend.Database_Luca_Definitivo as Luca
+import backend.Database_Luca_Definitivo as Luca
 
 
-input_path = 'C:/Users/Luca/OneDrive/Documenti/Data_Engineer/Francesco/lezione file csv/amazon.csv'
+input_path = r'C:\Users\rames\Documents\GitHub\Amazon\frontend\static\amazon.csv'
 
 with open(input_path, encoding="utf-8") as f:
     lettura = csv.reader(f, delimiter=",")

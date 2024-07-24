@@ -114,31 +114,25 @@ def crea_tabelle(db, tabella_name, colonna_ID, colonne_FK=None, colonne_aggiunti
     cursor.close()
 
 
-def insert_query(db, tabella_name, colonne, values):
+def insert_query(db, table_name, columns, values):
     cursor = db.cursor()
+    
+    placeholders = ', '.join(['%s'] * len(columns.split(', ')))
+    query_insert = f"INSERT IGNORE INTO {table_name} ({columns}) VALUES ({placeholders})"
+    
+    # Ensure values are formatted as a list of tuples
+    if not all(isinstance(v, (list, tuple)) for v in values):
+        values = [(v,) for v in values]
 
-    percentuali_esse = ', '.join(['%s'] * (len(colonne.split(', '))))
-    query_insert = f"""
-        INSERT IGNORE INTO {tabella_name} ({colonne})
-        VALUES ({percentuali_esse}) 
-        """
-
-    data = [(v,) for v in values]
     try:
-        cursor.executemany(query_insert, data)
-    except mysql.connector.errors.InterfaceError as e:
-        if "Failed executing the operation; Python type list cannot be converted" in str(e):
-            data = [tuple(v) for v in values]
-            cursor.executemany(query_insert, data)
-        elif "Failed executing the operation; Python type tuple cannot be converted" in str(e):
-            data = [tuple(v) for v in values]
-            cursor.executemany(query_insert, data)
-        else:
-            raise e
-    except mysql.connector.errors.IntegrityError as x:
-        raise x
-    db.commit()
-    cursor.close()
+        cursor.executemany(query_insert, values)
+        db.commit()
+        print(f"{cursor.rowcount} rows were inserted.")
+    except mysql.connector.Error as err:
+        print(f"Error: {err}")
+        db.rollback()
+    finally:
+        cursor.close()
 
 
 def select_query(db, tabella_name, colonne):
