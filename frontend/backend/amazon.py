@@ -1,4 +1,5 @@
 import csv
+import re
 
 import mysql.connector
 
@@ -72,85 +73,6 @@ for elem in categorie:
         category_set.add(i)
 
 
-Luca.create_database("localhost", "root", "", "amazon")
-
-db = Luca.connect_database("localhost", "root", "", "amazon")
-
-c = {
-    "category_names": "VARCHAR"
-}
-Luca.crea_tabelle(db, "category", "category_ID", colonne_aggiuntive=c)
-c = {
-    "discount_price": "FLOAT",
-    "actual_price": "FLOAT",
-    "discount_percentage": "INT"
-}
-Luca.crea_tabelle(db, "price", "price_ID", colonne_aggiuntive=c)
-c = {
-    "product_name": "VARCHAR",
-    "description": "VARCHAR",
-    "img_link": "TEXT",
-    "product_link": "TEXT"
-}
-
-c_fk = {
-    "price_ID": ("INT", "price", "price_ID")
-}
-Luca.crea_tabelle(db, "product", "product_ID", colonne_FK=c_fk, colonne_aggiuntive=c, tipo_ID="VARCHAR")
-
-c = {
-    "rating": "FLOAT",
-    "rating_count": "INT"
-
-}
-c_fk = {
-    "product_ID": ("VARCHAR", "product", "product_ID")
-}
-
-Luca.crea_tabelle(db, "rating", "rating_ID", colonne_FK=c_fk, colonne_aggiuntive=c)
-
-c_fk = {
-    "product_ID": ("VARCHAR", "product", "product_ID"),
-    "category_ID": ("INT", "category", "category_ID")
-}
-
-Luca.crea_tabelle(db, "category_products", "cat_product_ID", colonne_FK=c_fk)
-colonne = {
-    "username": "VARCHAR",
-    "password": "VARCHAR"
-}
-Luca.crea_tabelle(db, "utente_amazon", "utente_ID", colonne_aggiuntive=colonne)
-colonne = {
-    "like_boolean": "BOOLEAN"
-}
-Luca.crea_tabelle(db, "likes", "like_ID", colonne_aggiuntive=colonne)
-
-colonne_fk = {
-    "utente_ID": ("INT", "utente_amazon", "utente_ID"),
-    "like_ID": ("INT", "likes", "like_ID")
-
-}
-Luca.crea_tabelle(db, "utente_likes", "utente_likes_ID", colonne_FK=colonne_fk)
-
-colonne_fk = {
-    "utente_ID": ("INT", "utente_amazon", "utente_ID"),
-    "product_ID": ("VARCHAR", "product", "product_ID")
-
-}
-Luca.crea_tabelle(db, "utente_product", "utente_product_ID", colonne_FK=colonne_fk)
-
-
-insert_tuple = tuple(category_set)
-Luca.insert_query(db, "category", "category_names", insert_tuple)
-Luca.insert_query(db, "price", "discount_price, actual_price, discount_percentage", price_list)
-Luca.insert_query(db, "product", "product_ID, product_name, description, img_link, product_link, price_ID", product_list)
-
-diz_category_DB = dict(Luca.select_query(db, "category", "category_names, category_ID"))
-diz_product_DB = dict(Luca.select_query(db, "product", "product_name, product_ID"))
-
-Luca.insert_N_N(db, "category_products", "product_ID, category_ID", lista_completa, diz_category_DB, 2, diff_value=True)
-Luca.insert_query(db, "rating", "rating, rating_count, product_ID", rating_list)
-
 
 def get_categories(db):
     cursor = db.cursor()
@@ -205,20 +127,127 @@ def get_products(db):
     return products
 
 
+def validate_password(password):
+    if len(password) < 8:
+        return False, "Password più lunga pl0x"
+    if not re.search(r"[A-Z]", password):
+        return False, "Password maiuscola pl0x"
+    if not re.search(r"[a-z]", password):
+        return False, "Password minuscola pl0x"
+    if not re.search(r"[0-9]", password):
+        return False, "Password numerosa pl0x"
+    if not re.search(r"[@$!%*?_&]", password):
+        return False, "Password carattere disabile pl0x"
+    return True, "password valida"
+
+
 def login_signup(db, username, password):
     cursor = db.cursor()
-    queryselect = "SELECT username, password FROM utente_amazon"
+    queryselect = "SELECT username FROM utente_amazon"
     cursor.execute(queryselect)
     values = cursor.fetchall()
-    print(values)
+    usernames = [value[0] for value in values]
 
-    try:
-        query = "INSERT INTO utente_amazon (username, password) VALUES (%s, %s)"
-        data = (username, password)
-        cursor.execute(query, data)
-        db.commit()
-    except mysql.connector.Error as e:
-        print(e)
-    finally:
-        cursor.close()
+    if username not in usernames:
+        is_valid, message = validate_password(password)
+        if is_valid:
+            query = "INSERT INTO utente_amazon (username, password) VALUES (%s, %s)"
+            data = (username, password)
+            cursor.execute(query, data)
+            db.commit()
+            cursor.close()
+        else:
+            return {"status": "error", "message": message}
+    else:
+        return {"status": "error", "message": "Username già presente nel database"}
+
+
+def check_user_credentials(db, username, password):
+    cursor = db.cursor()
+    query = "SELECT * FROM utente_amazon WHERE username = %s AND password = %s"
+    print(query)
+    cursor.execute(query, (username, password))
+    user = cursor.fetchone()
+    cursor.close()
+    return user
+
+
+if __name__ == "__main__":
+    Luca.create_database("localhost", "root", "", "amazon")
+
+    db = Luca.connect_database("localhost", "root", "", "amazon")
+
+    c = {
+        "category_names": "VARCHAR"
+    }
+    Luca.crea_tabelle(db, "category", "category_ID", colonne_aggiuntive=c)
+    c = {
+        "discount_price": "FLOAT",
+        "actual_price": "FLOAT",
+        "discount_percentage": "INT"
+    }
+    Luca.crea_tabelle(db, "price", "price_ID", colonne_aggiuntive=c)
+    c = {
+        "product_name": "VARCHAR",
+        "description": "VARCHAR",
+        "img_link": "TEXT",
+        "product_link": "TEXT"
+    }
+
+    c_fk = {
+        "price_ID": ("INT", "price", "price_ID")
+    }
+    Luca.crea_tabelle(db, "product", "product_ID", colonne_FK=c_fk, colonne_aggiuntive=c, tipo_ID="VARCHAR")
+
+    c = {
+        "rating": "FLOAT",
+        "rating_count": "INT"
+
+    }
+    c_fk = {
+        "product_ID": ("VARCHAR", "product", "product_ID")
+    }
+
+    Luca.crea_tabelle(db, "rating", "rating_ID", colonne_FK=c_fk, colonne_aggiuntive=c)
+
+    c_fk = {
+        "product_ID": ("VARCHAR", "product", "product_ID"),
+        "category_ID": ("INT", "category", "category_ID")
+    }
+
+    Luca.crea_tabelle(db, "category_products", "cat_product_ID", colonne_FK=c_fk)
+    colonne = {
+        "username": "VARCHAR",
+        "password": "VARCHAR"
+    }
+    Luca.crea_tabelle(db, "utente_amazon", "utente_ID", colonne_aggiuntive=colonne)
+    colonne = {
+        "like_boolean": "BOOLEAN"
+    }
+    Luca.crea_tabelle(db, "likes", "like_ID", colonne_aggiuntive=colonne)
+
+    colonne_fk = {
+        "utente_ID": ("INT", "utente_amazon", "utente_ID"),
+        "like_ID": ("INT", "likes", "like_ID")
+
+    }
+    Luca.crea_tabelle(db, "utente_likes", "utente_likes_ID", colonne_FK=colonne_fk)
+
+    colonne_fk = {
+        "utente_ID": ("INT", "utente_amazon", "utente_ID"),
+        "product_ID": ("VARCHAR", "product", "product_ID")
+
+    }
+    Luca.crea_tabelle(db, "utente_product", "utente_product_ID", colonne_FK=colonne_fk)
+
+    insert_tuple = tuple(category_set)
+    Luca.insert_query(db, "category", "category_names", insert_tuple)
+    Luca.insert_query(db, "price", "discount_price, actual_price, discount_percentage", price_list)
+    Luca.insert_query(db, "product", "product_ID, product_name, description, img_link, product_link, price_ID", product_list)
+
+    diz_category_DB = dict(Luca.select_query(db, "category", "category_names, category_ID"))
+    diz_product_DB = dict(Luca.select_query(db, "product", "product_name, product_ID"))
+
+    Luca.insert_N_N(db, "category_products", "product_ID, category_ID", lista_completa, diz_category_DB, 2, diff_value=True)
+    Luca.insert_query(db, "rating", "rating, rating_count, product_ID", rating_list)
 

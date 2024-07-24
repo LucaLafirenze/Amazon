@@ -1,22 +1,13 @@
 from flask import Flask, request, redirect, render_template, url_for, session
 import json
-
-from Amazon.frontend.backend.amazon import login_signup
+from Amazon.frontend.backend.amazon import login_signup, check_user_credentials
 from backend import amazon as data
 import mysql.connector
 import Amazon.frontend.backend.Database_Luca_Definitivo as Luca
 
 
-# SELECT p.*, r.rating FROM product p JOIN rating r ON p.product_ID = r.product_ID
-
-# import sys
-# import os
-
-# external_module_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'backend'))
-# if external_module_path not in sys.path:
-#     sys.path.append(external_module_path)
-
 app = Flask(__name__)
+app.secret_key = 's3cr3t_k3y'
 db = Luca.connect_database("localhost", "root", "", "amazon")
 
 
@@ -65,26 +56,31 @@ def index():
     return render_template('index.html')
 
 
-# # Carica i dati dei prodotti dal file JSON
-# with open('static/products.json') as f:
-#     products = json.load(f)
-
-# @app.route('/search', methods=['GET'])
-# def search():
-#     product_id = request.args.get('product_id')
-#     product = next((p for p in products if p['product_id'] == product_id), None)
-#     if product:
-#         return redirect(product['link'])
-#     else:
-#         return "Product not found", 404
-
 @app.route('/login')
 def login():
     return render_template('login.html')
 
 
-@app.route('/to_signup', methods=['POST'])
+@app.route('/signup')
 def signup():
+    return render_template('signup.html')
+
+
+@app.route('/do_login', methods=['POST'])
+def do_login():
+    username = request.form['username']
+    password = request.form['password']
+    user = check_user_credentials(db, username, password)
+    if user:
+        session['utente_id'] = user[0]
+        session['username'] = user[1]
+        return redirect(url_for('index'))
+
+    return render_template('login.html')
+
+
+@app.route('/do_signup', methods=['POST'])
+def do_signup():
     username = request.form["username"]
     password = request.form["password"]
     login_signup(db, username, password)
