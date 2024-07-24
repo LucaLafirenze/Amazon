@@ -72,7 +72,7 @@ def crea_tabelle(db, tabella_name, colonna_ID, colonne_FK=None, colonne_aggiunti
             """
     else:
         tipo_ID = "INT"
-        if Auto_I is not None:
+        if Auto_I is None:
             query = f"""
                 CREATE TABLE IF NOT EXISTS {tabella_name} (
                 {colonna_ID} {tipo_ID} PRIMARY KEY
@@ -150,6 +150,20 @@ def select_query(db, tabella_name, colonne):
     return result
 
 
+#SELECT product_ID, utente_ID FROM likes WHERE product_ID = "B002PD61Y4" AND utente_ID = 1
+def select_query_WHERE(db, tabella_name, colonne, valori):
+    cursor = db.cursor()
+
+    where = " AND ".join([f"{col} = %s" for col in valori.keys()])
+
+    query_select = f"SELECT {colonne} FROM {tabella_name} WHERE {where}"
+
+    cursor.execute(query_select, tuple(valori.values()))
+    result = cursor.fetchall()
+    cursor.close()
+    return result
+
+
 def insert_N_N(db, tabella_name, colonne, lista, elem_dict, n, diff_value=None):
     sub_tuple_elem = []
     for row in lista:
@@ -165,6 +179,58 @@ def insert_N_N(db, tabella_name, colonne, lista, elem_dict, n, diff_value=None):
                         sub_tuple_elem.append((elem_dict[elem], row[0]))
 
     insert_query(db, tabella_name, colonne, sub_tuple_elem)
+
+
+def insert_likes(db, likes_diz):
+    cursor = db.cursor()
+    query = "INSERT INTO likes (utente_ID, product_ID) VALUES (%s, %s)"
+    data = [(utente_id, product_id) for product_id, utente_id in likes_diz.items()]
+    try:
+        cursor.executemany(query, data)
+        db.commit()
+    except mysql.connector.Error as err:
+        print(f"Errore: {err}")
+    finally:
+        cursor.close()
+
+
+def delete_likes(db, likes_diz):
+    cursor = db.cursor()
+
+    data = select_query(db, "likes", "product_ID, utente_ID")
+    likes_tuple = list(likes_diz.items())[0]
+
+    if likes_tuple in data:
+        conditions = {f"product_ID": f"{likes_tuple[0]}", "utente_ID": f"{likes_tuple[1]}"}
+        id_eliminare_tupla = select_query_WHERE(db, "likes", "likes_ID", conditions)
+        for num in id_eliminare_tupla:
+            id_eliminare = num[0]
+        cursor = db.cursor()
+        query = "DELETE FROM likes WHERE likes_ID = %s"
+        cursor.execute(query, (id_eliminare,))
+
+    db.commit()
+
+    cursor.close()
+
+
+"""def delete_likes(db, likes_diz):
+    cursor = db.cursor()
+    data = select_query(db, "likes", "product_ID, utente_ID")
+    print(data)
+    print(likes_diz)
+    if likes_diz.items() in data:
+        select_query(db, "likes", "likes_ID")
+        print("ciao")"""
+
+"""query = "DELETE FROM likes WHERE likes_ID = %s"
+    try:
+        cursor.executemany(query, data)
+        db.commit()
+    except mysql.connector.Error as err:
+        print(f"Errore: {err}")
+    finally:
+        cursor.close()"""
 
 
 def insert_urls(db, tabella_name, values):

@@ -1,22 +1,12 @@
-import os
-
 from flask import Flask, request, redirect, render_template, url_for, session
-import json
 from Amazon.frontend.backend.amazon import login_signup, check_user_credentials
 from backend import amazon as data
-import mysql.connector
 import Amazon.frontend.backend.Database_Luca_Definitivo as Luca
 import os
-# import sys
-
-
-# external_module_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'backend'))
-# if external_module_path not in sys.path:
-#     sys.path.append(external_module_path)
 
 app = Flask(__name__)
-
 app.secret_key = os.urandom(24) #Modifica And
+
 db = Luca.connect_database("localhost", "root", "", "amazon")
 
 
@@ -48,14 +38,21 @@ def products():
     categories = data.get_categories(db)
     return render_template('products.html', categories=categories, rating_list=rating_list, products=risultato, rating=rating, filtro=filtro)
 
+
+
 #Modifica And in piu vedi su products.html righe 10 il link e le righe dal 118-123
 @app.route('/like/<string:product_id>', methods=['POST'])
 def like(product_id):
+    likes_diz = {}
     liked_products = session.get('liked_products', [])
     if product_id in liked_products:
         liked_products.remove(product_id)
+        likes_diz[product_id] = session['utente_id']
+        Luca.delete_likes(db, likes_diz=likes_diz)
     else:
         liked_products.append(product_id)
+        likes_diz[product_id] = session['utente_id']
+        Luca.insert_likes(db, likes_diz=likes_diz)
     session['liked_products'] = liked_products
     return redirect(url_for('products'))
 

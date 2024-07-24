@@ -73,10 +73,9 @@ for elem in categorie:
         category_set.add(i)
 
 
-
 def get_categories(db):
     cursor = db.cursor()
-    cursor.execute("SELECT DISTINCT category_names FROM category")
+    cursor.execute("SELECT category_names FROM category")
     categories = [row[0] for row in cursor.fetchall()]
     cursor.close()
     return categories
@@ -165,7 +164,6 @@ def login_signup(db, username, password):
 def check_user_credentials(db, username, password):
     cursor = db.cursor()
     query = "SELECT * FROM utente_amazon WHERE username = %s AND password = %s"
-    print(query)
     cursor.execute(query, (username, password))
     user = cursor.fetchone()
     cursor.close()
@@ -180,13 +178,13 @@ if __name__ == "__main__":
     c = {
         "category_names": "VARCHAR"
     }
-    Luca.crea_tabelle(db, "category", "category_ID", colonne_aggiuntive=c)
+    Luca.crea_tabelle(db, "category", "category_ID", colonne_aggiuntive=c, Auto_I=True)
     c = {
         "discount_price": "FLOAT",
         "actual_price": "FLOAT",
         "discount_percentage": "INT"
     }
-    Luca.crea_tabelle(db, "price", "price_ID", colonne_aggiuntive=c)
+    Luca.crea_tabelle(db, "price", "price_ID", colonne_aggiuntive=c, Auto_I=True)
     c = {
         "product_name": "VARCHAR",
         "description": "VARCHAR",
@@ -208,37 +206,33 @@ if __name__ == "__main__":
         "product_ID": ("VARCHAR", "product", "product_ID")
     }
 
-    Luca.crea_tabelle(db, "rating", "rating_ID", colonne_FK=c_fk, colonne_aggiuntive=c)
+    Luca.crea_tabelle(db, "rating", "rating_ID", colonne_FK=c_fk, colonne_aggiuntive=c, Auto_I=True)
 
     c_fk = {
         "product_ID": ("VARCHAR", "product", "product_ID"),
         "category_ID": ("INT", "category", "category_ID")
     }
 
-    Luca.crea_tabelle(db, "category_products", "cat_product_ID", colonne_FK=c_fk)
+    Luca.crea_tabelle(db, "category_products", "cat_product_ID", colonne_FK=c_fk, Auto_I=True)
     colonne = {
         "username": "VARCHAR",
         "password": "VARCHAR"
     }
-    Luca.crea_tabelle(db, "utente_amazon", "utente_ID", colonne_aggiuntive=colonne)
-    colonne = {
-        "like_boolean": "BOOLEAN"
-    }
-    Luca.crea_tabelle(db, "likes", "like_ID", colonne_aggiuntive=colonne)
+    Luca.crea_tabelle(db, "utente_amazon", "utente_ID", colonne_aggiuntive=colonne, Auto_I=True)
 
     colonne_fk = {
-        "utente_ID": ("INT", "utente_amazon", "utente_ID"),
-        "like_ID": ("INT", "likes", "like_ID")
+        "product_ID": ("VARCHAR", "product", "product_ID"),
+        "utente_ID": ("INT", "utente_amazon", "utente_ID")
 
     }
-    Luca.crea_tabelle(db, "utente_likes", "utente_likes_ID", colonne_FK=colonne_fk)
+    Luca.crea_tabelle(db, "likes", "likes_ID", colonne_FK=colonne_fk, Auto_I=True)
 
     colonne_fk = {
         "utente_ID": ("INT", "utente_amazon", "utente_ID"),
         "product_ID": ("VARCHAR", "product", "product_ID")
 
     }
-    Luca.crea_tabelle(db, "utente_product", "utente_product_ID", colonne_FK=colonne_fk)
+    Luca.crea_tabelle(db, "utente_product", "utente_product_ID", colonne_FK=colonne_fk, Auto_I=True)
 
     insert_tuple = tuple(category_set)
     Luca.insert_query(db, "category", "category_names", insert_tuple)
