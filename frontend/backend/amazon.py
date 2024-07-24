@@ -134,9 +134,9 @@ def validate_password(password):
         return False, "Password minuscola pl0x"
     if not re.search(r"[0-9]", password):
         return False, "Password numerosa pl'x"
-    if not re.search(r"[@$!%*?&]", password):
+    if not re.search(r"[@$!%*?_&]", password):
         return False, "Password carattere disabile pl0x"
-    return True, password
+    return True, "password valida"
 
 
 def login_signup(db, username, password):
@@ -144,20 +144,20 @@ def login_signup(db, username, password):
     queryselect = "SELECT username FROM utente_amazon"
     cursor.execute(queryselect)
     values = cursor.fetchall()
-    if username in values:
-        if validate_password(password):
-            try:
-                query = "INSERT INTO utente_amazon (username, password) VALUES (%s, %s)"
-                data = (username, password)
-                cursor.execute(query, data)
-                db.commit()
-            except mysql.connector.Error as e:
-                print(e)
-            finally:
-                cursor.close()
+    usernames = [value[0] for value in values]
 
+    if username not in usernames:
+        is_valid, message = validate_password(password)
+        if is_valid:
+            query = "INSERT INTO utente_amazon (username, password) VALUES (%s, %s)"
+            data = (username, password)
+            cursor.execute(query, data)
+            db.commit()
+            cursor.close()
+        else:
+            return {"status": "error", "message": message}
     else:
-        print("username presente nel db")
+        return {"status": "error", "message": "Username già presente nel database"}
 
 
 if __name__ == "__main__":
@@ -227,7 +227,6 @@ if __name__ == "__main__":
 
     }
     Luca.crea_tabelle(db, "utente_product", "utente_product_ID", colonne_FK=colonne_fk)
-
 
     insert_tuple = tuple(category_set)
     Luca.insert_query(db, "category", "category_names", insert_tuple)
