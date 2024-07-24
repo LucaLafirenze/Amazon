@@ -1,13 +1,22 @@
+import os
+
 from flask import Flask, request, redirect, render_template, url_for, session
 import json
 from Amazon.frontend.backend.amazon import login_signup, check_user_credentials
 from backend import amazon as data
 import mysql.connector
 import Amazon.frontend.backend.Database_Luca_Definitivo as Luca
+import os
+# import sys
 
+
+# external_module_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'backend'))
+# if external_module_path not in sys.path:
+#     sys.path.append(external_module_path)
 
 app = Flask(__name__)
-app.secret_key = 's3cr3t_k3y'
+
+app.secret_key = os.urandom(24) #Modifica And
 db = Luca.connect_database("localhost", "root", "", "amazon")
 
 
@@ -39,8 +48,8 @@ def products():
     categories = data.get_categories(db)
     return render_template('products.html', categories=categories, rating_list=rating_list, products=risultato, rating=rating, filtro=filtro)
 
-
-@app.route('/like/<int:product_id>', methods=['POST'])
+#Modifica And in piu vedi su products.html righe 10 il link e le righe dal 118-123
+@app.route('/like/<string:product_id>', methods=['POST'])
 def like(product_id):
     liked_products = session.get('liked_products', [])
     if product_id in liked_products:
@@ -48,7 +57,7 @@ def like(product_id):
     else:
         liked_products.append(product_id)
     session['liked_products'] = liked_products
-    return '', 204  # Nessun contenuto da restituire
+    return redirect(url_for('products'))
 
 
 @app.route('/')
