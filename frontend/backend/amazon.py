@@ -1,4 +1,5 @@
 import csv
+import re
 
 import mysql.connector
 
@@ -124,28 +125,39 @@ def get_products(db):
     return products
 
 
+def validate_password(password):
+    if len(password) < 8:
+        return False, "Password più lunga pl0x"
+    if not re.search(r"[A-Z]", password):
+        return False, "Password maiuscola pl0x"
+    if not re.search(r"[a-z]", password):
+        return False, "Password minuscola pl0x"
+    if not re.search(r"[0-9]", password):
+        return False, "Password numerosa pl'x"
+    if not re.search(r"[@$!%*?&]", password):
+        return False, "Password carattere disabile pl0x"
+    return True, password
+
+
 def login_signup(db, username, password):
     cursor = db.cursor()
-    queryselect = "SELECT username, password FROM utente_amazon"
+    queryselect = "SELECT username FROM utente_amazon"
     cursor.execute(queryselect)
     values = cursor.fetchall()
-    print(values)
+    if username in values:
+        if validate_password(password):
+            try:
+                query = "INSERT INTO utente_amazon (username, password) VALUES (%s, %s)"
+                data = (username, password)
+                cursor.execute(query, data)
+                db.commit()
+            except mysql.connector.Error as e:
+                print(e)
+            finally:
+                cursor.close()
 
-    try:
-        query = "INSERT INTO utente_amazon (username, password) VALUES (%s, %s)"
-        data = (username, password)
-        cursor.execute(query, data)
-        db.commit()
-    except mysql.connector.Error as e:
-        print(e)
-    finally:
-        cursor.close()
-
-
-
-"""def login_signup(db, username, password):
-    data = username, password
-    Luca.insert_query(db, "utente_amazon", "username, password", data)"""
+    else:
+        print("username presente nel db")
 
 
 if __name__ == "__main__":

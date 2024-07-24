@@ -89,7 +89,7 @@ def signup():
     password = request.form["password"]
     login_signup(db, username, password)
 
-    return "dati inseriti"
+    return render_template('login.html')
 
 
 
