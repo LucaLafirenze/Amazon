@@ -10,13 +10,15 @@ import backend.Database_Luca_Definitivo as Luca
 # SELECT p.*, r.rating FROM product p JOIN rating r ON p.product_ID = r.product_ID
 
 # import sys
-# import os
+import os
 
 # external_module_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'backend'))
 # if external_module_path not in sys.path:
 #     sys.path.append(external_module_path)
 
 app = Flask(__name__)
+
+app.secret_key = os.urandom(24)
 db = Luca.connect_database("localhost", "root", "", "amazon")
 
 
@@ -49,7 +51,7 @@ def products():
     return render_template('products.html', categories=categories, rating_list=rating_list, products=risultato, rating=rating, filtro=filtro)
 
 
-@app.route('/like/<int:product_id>', methods=['POST'])
+@app.route('/like/<string:product_id>', methods=['POST'])
 def like(product_id):
     liked_products = session.get('liked_products', [])
     if product_id in liked_products:
@@ -57,7 +59,7 @@ def like(product_id):
     else:
         liked_products.append(product_id)
     session['liked_products'] = liked_products
-    return '', 204  # Nessun contenuto da restituire
+    return redirect(url_for('products'))
 
 
 @app.route('/')
