@@ -71,87 +71,6 @@ for elem in categorie:
     for i in elem:
         category_set.add(i)
 
-
-Luca.create_database("localhost", "root", "", "amazon")
-
-db = Luca.connect_database("localhost", "root", "", "amazon")
-
-c = {
-    "category_names": "VARCHAR"
-}
-Luca.crea_tabelle(db, "category", "category_ID", colonne_aggiuntive=c)
-c = {
-    "discount_price": "FLOAT",
-    "actual_price": "FLOAT",
-    "discount_percentage": "INT"
-}
-Luca.crea_tabelle(db, "price", "price_ID", colonne_aggiuntive=c)
-c = {
-    "product_name": "VARCHAR",
-    "description": "VARCHAR",
-    "img_link": "TEXT",
-    "product_link": "TEXT"
-}
-
-c_fk = {
-    "price_ID": ("INT", "price", "price_ID")
-}
-Luca.crea_tabelle(db, "product", "product_ID", colonne_FK=c_fk, colonne_aggiuntive=c, tipo_ID="VARCHAR")
-
-c = {
-    "rating": "FLOAT",
-    "rating_count": "INT"
-
-}
-c_fk = {
-    "product_ID": ("VARCHAR", "product", "product_ID")
-}
-
-Luca.crea_tabelle(db, "rating", "rating_ID", colonne_FK=c_fk, colonne_aggiuntive=c)
-
-c_fk = {
-    "product_ID": ("VARCHAR", "product", "product_ID"),
-    "category_ID": ("INT", "category", "category_ID")
-}
-
-Luca.crea_tabelle(db, "category_products", "cat_product_ID", colonne_FK=c_fk)
-colonne = {
-    "username": "VARCHAR",
-    "password": "VARCHAR"
-}
-Luca.crea_tabelle(db, "utente_amazon", "utente_ID", colonne_aggiuntive=colonne)
-colonne = {
-    "like_boolean": "BOOLEAN"
-}
-Luca.crea_tabelle(db, "likes", "like_ID", colonne_aggiuntive=colonne)
-
-colonne_fk = {
-    "utente_ID": ("INT", "utente_amazon", "utente_ID"),
-    "like_ID": ("INT", "likes", "like_ID")
-
-}
-Luca.crea_tabelle(db, "utente_likes", "utente_likes_ID", colonne_FK=colonne_fk)
-
-colonne_fk = {
-    "utente_ID": ("INT", "utente_amazon", "utente_ID"),
-    "product_ID": ("VARCHAR", "product", "product_ID")
-
-}
-Luca.crea_tabelle(db, "utente_product", "utente_product_ID", colonne_FK=colonne_fk)
-
-
-insert_tuple = tuple(category_set)
-Luca.insert_query(db, "category", "category_names", insert_tuple)
-Luca.insert_query(db, "price", "discount_price, actual_price, discount_percentage", price_list)
-Luca.insert_query(db, "product", "product_ID, product_name, description, img_link, product_link, price_ID", product_list)
-
-diz_category_DB = dict(Luca.select_query(db, "category", "category_names, category_ID"))
-diz_product_DB = dict(Luca.select_query(db, "product", "product_name, product_ID"))
-
-Luca.insert_N_N(db, "category_products", "product_ID, category_ID", lista_completa, diz_category_DB, 2, diff_value=True)
-Luca.insert_query(db, "rating", "rating, rating_count, product_ID", rating_list)
-
-
 def get_categories(db):
     cursor = db.cursor()
     cursor.execute("SELECT DISTINCT category_names FROM category")
@@ -224,3 +143,84 @@ def login_signup(db, username, password):
 """def login_signup(db, username, password):
     data = username, password
     Luca.insert_query(db, "utente_amazon", "username, password", data)"""
+
+
+if __name__ == "__main__":
+    Luca.create_database("localhost", "root", "", "amazon")
+
+    db = Luca.connect_database("localhost", "root", "", "amazon")
+
+    c = {
+        "category_names": "VARCHAR"
+    }
+    Luca.crea_tabelle(db, "category", "category_ID", colonne_aggiuntive=c)
+    c = {
+        "discount_price": "FLOAT",
+        "actual_price": "FLOAT",
+        "discount_percentage": "INT"
+    }
+    Luca.crea_tabelle(db, "price", "price_ID", colonne_aggiuntive=c)
+    c = {
+        "product_name": "VARCHAR",
+        "description": "VARCHAR",
+        "img_link": "TEXT",
+        "product_link": "TEXT"
+    }
+
+    c_fk = {
+        "price_ID": ("INT", "price", "price_ID")
+    }
+    Luca.crea_tabelle(db, "product", "product_ID", colonne_FK=c_fk, colonne_aggiuntive=c, tipo_ID="VARCHAR")
+
+    c = {
+        "rating": "FLOAT",
+        "rating_count": "INT"
+
+    }
+    c_fk = {
+        "product_ID": ("VARCHAR", "product", "product_ID")
+    }
+
+    Luca.crea_tabelle(db, "rating", "rating_ID", colonne_FK=c_fk, colonne_aggiuntive=c)
+
+    c_fk = {
+        "product_ID": ("VARCHAR", "product", "product_ID"),
+        "category_ID": ("INT", "category", "category_ID")
+    }
+
+    Luca.crea_tabelle(db, "category_products", "cat_product_ID", colonne_FK=c_fk)
+    colonne = {
+        "username": "VARCHAR",
+        "password": "VARCHAR"
+    }
+    Luca.crea_tabelle(db, "utente_amazon", "utente_ID", colonne_aggiuntive=colonne)
+    colonne = {
+        "like_boolean": "BOOLEAN"
+    }
+    Luca.crea_tabelle(db, "likes", "like_ID", colonne_aggiuntive=colonne)
+
+    colonne_fk = {
+        "utente_ID": ("INT", "utente_amazon", "utente_ID"),
+        "like_ID": ("INT", "likes", "like_ID")
+
+    }
+    Luca.crea_tabelle(db, "utente_likes", "utente_likes_ID", colonne_FK=colonne_fk)
+
+    colonne_fk = {
+        "utente_ID": ("INT", "utente_amazon", "utente_ID"),
+        "product_ID": ("VARCHAR", "product", "product_ID")
+
+    }
+    Luca.crea_tabelle(db, "utente_product", "utente_product_ID", colonne_FK=colonne_fk)
+
+
+    insert_tuple = tuple(category_set)
+    Luca.insert_query(db, "category", "category_names", insert_tuple)
+    Luca.insert_query(db, "price", "discount_price, actual_price, discount_percentage", price_list)
+    Luca.insert_query(db, "product", "product_ID, product_name, description, img_link, product_link, price_ID", product_list)
+
+    diz_category_DB = dict(Luca.select_query(db, "category", "category_names, category_ID"))
+    diz_product_DB = dict(Luca.select_query(db, "product", "product_name, product_ID"))
+
+    Luca.insert_N_N(db, "category_products", "product_ID, category_ID", lista_completa, diz_category_DB, 2, diff_value=True)
+    Luca.insert_query(db, "rating", "rating, rating_count, product_ID", rating_list)
