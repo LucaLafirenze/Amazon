@@ -207,11 +207,14 @@ def get_products(db):
 
 def login_signup(db, username, password):
     cursor = db.cursor()
+    queryselect = "SELECT username, password FROM utente_amazon"
+    cursor.execute(queryselect)
+    values = cursor.fetchall()
+    print(values)
+
     try:
         query = "INSERT INTO utente_amazon (username, password) VALUES (%s, %s)"
         data = (username, password)
-        data = tuple(data)
-        print(data)
         cursor.execute(query, data)
         db.commit()
     except mysql.connector.Error as e:
@@ -219,8 +222,3 @@ def login_signup(db, username, password):
     finally:
         cursor.close()
 
-
-
-"""def login_signup(db, username, password):
-    data = username, password
-    Luca.insert_query(db, "utente_amazon", "username, password", data)"""
