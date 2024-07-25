@@ -1,0 +1,21 @@
+{% extends 'products.html' %}
+
+{% block title %}Carrello{% endblock %}
+
+{% block content %}
+    <h1>Il mio Carrello</h1>
+    <div class="cart">
+        <div class="cart-items">
+            {% for item in cart %}
+                <div class="cart-item">
+                    <span>{{ item.name }} - €{{ item.price }}</span>
+                    <span>Quantità: {{ item.quantity }}</span>
+                </div>
+            {% endfor %}
+        </div>
+        <div class="cart-total">
+            <strong>Totale: €{{ total }}</strong>
+        </div>
+        <a href="{{ url_for('checkout') }}"><button>Checkout</button></a>
+    </div>
+{% endblock %}

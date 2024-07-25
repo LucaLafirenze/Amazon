@@ -78,7 +78,13 @@
             </ul>
           </li>
           <li class="nav-item">
-            <a class="nav-link active" aria-current="page" href="{{ url_for('login') }}">Profile</a>
+            <a class="nav-link" aria-current="page" href="{{ url_for('login') }}">Profile</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('categories') }}">Categorie</a>
+          </li>
+          <li>
+            <a href="{{ url_for('cart') }}"><img src="{{ url_for('static', filename='/images/cart_icon_160296.webp') }}" alt="user" width="40px" height="40px"></a>
           </li>
         </ul>
 
@@ -124,6 +130,9 @@
                 <h5 class="card-title">{{ elem[2] }}</h5>
                 <p> {{ elem[0] }} </p>
                 <p class="card-text">{{ elem[3] }}</p>
+                <form action="{{ url_for('add_to_cart') }}" method="post"></form>
+                <input type="hidden" name="product_name" value="{{ elem[2] }}">
+                <button type="submit">Aggiungi al carrello</button>
               </div>
             </div>
           </div>

@@ -93,6 +93,39 @@ def do_signup():
     return render_template('login.html')
 
 
+@app.route('/add_to_cart', methods=['POST'])
+def add_to_cart():
+    product_name = request.form.get('product_name')
+    product_price = float(request.form.get('product_price'))
+
+    if 'cart' not in session:
+        session['cart'] = []
+
+    cart = session['cart']
+    
+    for item in cart:
+        if item['name'] == product_name:
+            item['quantity'] += 1
+            break
+    else:
+        cart.append({'name': product_name, 'price': product_price, 'quantity': 1})
+    
+    session['cart'] = cart
+    return redirect(url_for('products'))
+
+@app.route('/cart')
+def cart():
+    cart = session.get('cart', [])
+    total = sum(item['price'] * item['quantity'] for item in cart)
+    return render_template('cart.html', cart=cart, total=total)
+
+
+@app.route('/categorie')
+def categories():
+    categories = data.get_categories(db)
+    return render_template('categories.html', categories=categories)
+
+
 if __name__ == '__main__':
     app.run(debug=True) 
         
