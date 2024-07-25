@@ -96,12 +96,22 @@
       <!-- Categorie -->
 
       <div class="container-fluid mt-5">
+        <div class="container d-flex">
+        <form class="text-center ms-4" action="#" method="post">
+            <button type="submit"
+              class="btn btn-primary">
+              Add Categories
+            </button>
+          </form>
+        <div class="container">
         <h2 class="text-center ms-4">CATEGORIES</h2>
           <ul class="text-center">
             {% for category in categories %}
             <h6><a href="#">{{ category }}</a></h6>
             {% endfor %}
           </ul>
+        </div>
+        </div>
       </div>
 
   </body>
