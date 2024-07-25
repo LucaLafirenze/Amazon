@@ -122,22 +122,19 @@ def insert_query(db, tabella_name, colonne, values):
         VALUES ({percentuali_esse}) 
         """
 
-    data = [(v,) for v in values]
+    # Ensure values are formatted as a list of tuples
+    if not all(isinstance(v, (list, tuple)) for v in values):
+        values = [(v,) for v in values]
+
     try:
-        cursor.executemany(query_insert, data)
-    except mysql.connector.errors.InterfaceError as e:
-        if "Failed executing the operation; Python type list cannot be converted" in str(e):
-            data = [tuple(v) for v in values]
-            cursor.executemany(query_insert, data)
-        elif "Failed executing the operation; Python type tuple cannot be converted" in str(e):
-            data = [tuple(v) for v in values]
-            cursor.executemany(query_insert, data)
-        else:
-            raise e
-    except mysql.connector.errors.IntegrityError as x:
-        raise x
-    db.commit()
-    cursor.close()
+        cursor.executemany(query_insert, values)
+        db.commit()
+        print(f"{cursor.rowcount} rows were inserted.")
+    except mysql.connector.Error as err:
+        print(f"Error: {err}")
+        db.rollback()
+    finally:
+        cursor.close()
 
 
 def select_query(db, tabella_name, colonne):
