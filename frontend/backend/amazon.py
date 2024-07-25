@@ -3,7 +3,7 @@ import re
 
 import mysql.connector
 
-import Amazon.frontend.backend.Database_Luca_Definitivo as Luca
+import Amazon.frontend.backend.Database_Luca_Amazon as Luca
 
 
 input_path = 'C:/Users/Luca/OneDrive/Documenti/Data_Engineer/Francesco/lezione file csv/amazon.csv'

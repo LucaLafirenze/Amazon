@@ -1,7 +1,7 @@
 from flask import Flask, request, redirect, render_template, url_for, session
 from Amazon.frontend.backend.amazon import login_signup, check_user_credentials
 from backend import amazon as data
-import Amazon.frontend.backend.Database_Luca_Definitivo as Luca
+import Amazon.frontend.backend.Database_Luca_Amazon as Luca
 import os
 
 app = Flask(__name__)
@@ -39,7 +39,6 @@ def products():
     return render_template('products.html', categories=categories, rating_list=rating_list, products=risultato, rating=rating, filtro=filtro)
 
 
-
 #Modifica And in piu vedi su products.html righe 10 il link e le righe dal 118-123
 @app.route('/like/<string:product_id>', methods=['POST'])
 def like(product_id):
@@ -48,11 +47,11 @@ def like(product_id):
     if product_id in liked_products:
         liked_products.remove(product_id)
         likes_diz[product_id] = session['utente_id']
-        Luca.delete_likes(db, likes_diz=likes_diz)
+        Luca.delete_likes(db, "likes", "product_ID, utente_ID", elem_diz=likes_diz)
     else:
         liked_products.append(product_id)
         likes_diz[product_id] = session['utente_id']
-        Luca.insert_likes(db, likes_diz=likes_diz)
+        Luca.insert_likes(db, "likes", "product_ID, utente_ID", elem_diz=likes_diz)
     session['liked_products'] = liked_products
     return redirect(url_for('products'))
 
