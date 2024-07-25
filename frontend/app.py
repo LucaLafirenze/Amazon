@@ -1,7 +1,7 @@
 from flask import Flask, request, redirect, render_template, url_for, session
-from Amazon.frontend.backend.amazon import login_signup, check_user_credentials
+from backend.amazon import login_signup, check_user_credentials
 from backend import amazon as data
-import Amazon.frontend.backend.Database_Luca_Amazon as Luca
+import backend.Database_Luca_Amazon as Luca
 import os
 
 app = Flask(__name__)
