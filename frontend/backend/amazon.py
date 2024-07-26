@@ -126,6 +126,30 @@ def get_products(db):
         cursor.close()
     return products
 
+def get_products_in_utente_product(db):
+    products = []
+    cursor = db.cursor()
+    try:
+        cursor.execute("SELECT * FROM utente_product JOIN product ON utente_product.product_ID = product.product_ID")
+        products = cursor.fetchall()
+    except mysql.connector.Error as err:
+        print(f"Error: {err}")
+    finally:
+        cursor.close()
+    return products
+
+def get_price_in_utente_product(db):
+    products = []
+    cursor = db.cursor()
+    try:
+        cursor.execute("SELECT discount_price FROM utente_product JOIN product ON utente_product.product_ID = product.product_ID JOIN price ON product.price_ID = price.price_ID")
+        products = cursor.fetchall()
+    except mysql.connector.Error as err:
+        print(f"Error: {err}")
+    finally:
+        cursor.close()
+    return products
+
 
 def validate_password(password):
     if len(password) < 8:
