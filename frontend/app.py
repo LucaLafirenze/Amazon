@@ -45,7 +45,6 @@ def products():
 def like(product_id):
     likes_diz = {}
     liked_products = session.get('liked_products', [])
-    print(liked_products)
     if product_id in liked_products:
         liked_products.remove(product_id)
         likes_diz[product_id] = session['utente_id']
@@ -112,8 +111,15 @@ def do_login():
 def add_to_cart(product_id):
 
     product_diz = {product_id: session['utente_id']}
+    #product_cart = session.get('product_cart', [])
     Luca.insert_likes(db, "utente_product", "product_ID, utente_ID", elem_diz=product_diz)
 
+    """print(product_cart)
+    if product_id in product_cart:
+        product_cart.remove(product_id)
+    else:
+        product_cart.append(product_id)
+    session['product_cart'] = product_cart"""
     return redirect(url_for('products'))
 
 
