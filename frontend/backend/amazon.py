@@ -3,10 +3,10 @@ import re
 
 import mysql.connector
 
-import backend.Database_Luca_Amazon as Luca
+import Amazon.frontend.backend.Database_Luca_Amazon as Luca
 
-
-input_path = r'C:\Users\rames\Documents\GitHub\Amazon\frontend\static\amazon.csv'
+input_path = 'C:/Users/Luca/OneDrive/Documenti/Data_Engineer/Francesco/lezione file csv/amazon.csv'
+#input_path = r'C:\Users\rames\Documents\GitHub\Amazon\frontend\static\amazon.csv'
 
 with open(input_path, encoding="utf-8") as f:
     lettura = csv.reader(f, delimiter=",")
@@ -155,6 +155,8 @@ def login_signup(db, username, password):
             cursor.execute(query, data)
             db.commit()
             cursor.close()
+            return {"status": "success", "message": "Registrazione avvenuta con successo"}
+
         else:
             return {"status": "error", "message": message}
     else:
