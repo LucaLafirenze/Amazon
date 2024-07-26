@@ -1,11 +1,13 @@
-from flask import Flask, request, redirect, render_template, url_for, session
+from flask import Flask, request, redirect, render_template, url_for, session, flash
 from backend.amazon import login_signup, check_user_credentials
 from backend import amazon as data
 import backend.Database_Luca_Amazon as Luca
+from backend.amazon import validate_password
 import os
+import mysql.connector
 
 app = Flask(__name__)
-app.secret_key = os.urandom(24) #Modifica And
+app.secret_key = 'supersecretkey' #Modifica And
 
 db = Luca.connect_database("localhost", "root", "", "amazon")
 
@@ -71,6 +73,62 @@ def signup():
     return render_template('signup.html')
 
 
+
+
+# @app.route('/do_signup', methods=['GET', 'POST'])
+# def signup():
+#     if request.method == 'POST':
+#         username = request.form['username']
+#         password = request.form['password']
+#         is_valid, message = validate_password(password)
+        
+#         if not is_valid:
+#             flash(message, 'error')
+#             return redirect(url_for('signup'))
+        
+#         # Procedi con la registrazione (salvataggio nel database, ecc.)
+#         flash('Registrazione completata con successo', 'success')
+#         return redirect(url_for('signup'))
+    
+#     return render_template('signup.html')
+
+# if __name__ == '__main__':
+#     app.run(debug=True)
+
+
+@app.route('/do_signup', methods=['POST'])
+def do_signup():
+    username = request.form['username']
+    password = request.form['password']
+    
+    is_valid, message = validate_password(password)
+    if not is_valid:
+        flash(message, 'error')
+        return redirect(url_for('signup'))
+    
+    # Connessione al database (sostituisci con le tue credenziali)
+    db = mysql.connector.connect(
+        host="localhost",
+        user="tuo_utente",
+        password="tua_password",
+        database="tuo_database"
+    )
+
+    user = check_user_credentials(db, username, password)
+    if user:
+        flash('Utente già registrato', 'error')
+        return redirect(url_for('signup'))
+
+    cursor = db.cursor()
+    query = "INSERT INTO utente_amazon (username, password) VALUES (%s, %s)"
+    cursor.execute(query, (username, password))
+    db.commit()
+    cursor.close()
+    db.close()
+
+    flash('Registrazione completata con successo', 'success')
+    return redirect(url_for('signup'))
+
 @app.route('/do_login', methods=['POST'])
 def do_login():
     username = request.form['username']
@@ -84,13 +142,23 @@ def do_login():
     return render_template('login.html')
 
 
-@app.route('/do_signup', methods=['POST'])
-def do_signup():
-    username = request.form["username"]
-    password = request.form["password"]
-    login_signup(db, username, password)
+# @app.route('/do_signup', methods=['POST'])
+# def do_signup():
+#     username = request.form["username"]
+#     # password = request.form["password"]
+#     # login_signup(db, username, password)
+#     if request.method == 'POST':
+#         password = request.form['password']
+#         is_valid, message = validate_password(password)
+        
+#         if not is_valid:
+#             flash(message, 'error')
+#             return redirect(url_for('signup'))
+        
+#         flash('Registrazione completata con successo', 'success')
+#         return redirect(url_for('signup'))
 
-    return render_template('login.html')
+#     return render_template('login.html')
 
 
 @app.route('/add_to_cart', methods=['POST'])
