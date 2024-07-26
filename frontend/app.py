@@ -100,7 +100,7 @@ def add_to_cart(product_id):
     product_diz = {}
     username = session.get('utente_id')
     print(username)
-    
+
     return redirect(url_for('products'))
 
 
