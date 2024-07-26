@@ -44,6 +44,7 @@ def products():
 def like(product_id):
     likes_diz = {}
     liked_products = session.get('liked_products', [])
+    print(liked_products)
     if product_id in liked_products:
         liked_products.remove(product_id)
         likes_diz[product_id] = session['utente_id']
@@ -93,25 +94,27 @@ def do_signup():
     return render_template('login.html')
 
 
-@app.route('/add_to_cart', methods=['POST'])
-def add_to_cart():
-    product_name = request.form.get('product_name')
-    product_price = float(request.form.get('product_price'))
-
-    if 'cart' not in session:
+@app.route('/add_to_cart/<string:product_id>', methods=['POST'])
+def add_to_cart(product_id):
+    print(product_id)
+    product_diz = {}
+    username = session.get('utente_id')
+    print(username)
+    """if 'cart' not in session:
         session['cart'] = []
 
     cart = session['cart']
     
     for item in cart:
-        if item['name'] == product_name:
+        if item['id'] == product_id:
             item['quantity'] += 1
             break
     else:
-        cart.append({'name': product_name, 'price': product_price, 'quantity': 1})
+        cart.append({'id': product_id, 'price': product_price, 'quantity': 1})
     
-    session['cart'] = cart
+    session['cart'] = cart"""
     return redirect(url_for('products'))
+
 
 @app.route('/cart')
 def cart():

@@ -179,8 +179,8 @@ def insert_N_N(db, tabella_name, colonne, lista, elem_dict, n, diff_value=None):
 def insert_likes(db, tabella_name, colonne, elem_diz):
     cursor = db.cursor()
     percentuali_esse = ', '.join(['%s'] * (len(colonne.split(', '))))
-    query = f"INSERT INTO {tabella_name} {colonne}) VALUES ({percentuali_esse})"
-    data = [(utente_id, product_id) for product_id, utente_id in elem_diz.items()]
+    query = f"INSERT INTO {tabella_name} ({colonne}) VALUES ({percentuali_esse})"
+    data = [(utente_id, product_id) for utente_id, product_id in elem_diz.items()]
     try:
         cursor.executemany(query, data)
         db.commit()

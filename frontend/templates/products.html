@@ -130,9 +130,9 @@
                 <h5 class="card-title">{{ elem[2] }}</h5>
                 <p> {{ elem[0] }} </p>
                 <p class="card-text">{{ elem[3] }}</p>
-                <form action="{{ url_for('add_to_cart') }}" method="post"></form>
-                <input type="hidden" name="product_name" value="{{ elem[2] }}">
+                <form action="{{ url_for('add_to_cart', product_id=elem[1]) }}" method="post">
                 <button type="submit">Aggiungi al carrello</button>
+                  </form>
               </div>
             </div>
           </div>

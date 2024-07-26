@@ -1,23 +1,14 @@
-from backend import amazon as data
-
-
-
-
-for elem in data.get_products_name():
-    print(type(elem))
-
-lista_completa = []
-for elem in data.get_products():
-    lista_completa.append(elem)
-
-rating = []
-for elem in data.get_rating():
-    rating.append(elem)
-
-risultato = []
-for t1, t2 in zip(rating, lista_completa):
-    nuova_tupla = t1 + t2
-    risultato.append(nuova_tupla)
-
-print(risultato)
-
+@app.route('/like/<string:product_id>', methods=['POST'])
+def like(product_id):
+    likes_diz = {}
+    liked_products = session.get('liked_products', [])
+    if product_id in liked_products:
+        liked_products.remove(product_id)
+        likes_diz[product_id] = session['utente_id']
+        Luca.delete_likes(db, "likes", "product_ID, utente_ID", elem_diz=likes_diz)
+    else:
+        liked_products.append(product_id)
+        likes_diz[product_id] = session['utente_id']
+        Luca.insert_likes(db, "likes", "product_ID, utente_ID", elem_diz=likes_diz)
+    session['liked_products'] = liked_products
+    return redirect(url_for('products'))
