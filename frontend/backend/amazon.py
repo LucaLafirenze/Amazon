@@ -5,7 +5,6 @@ import mysql.connector
 
 import Amazon.frontend.backend.Database_Luca_Amazon as Luca
 
-
 input_path = 'C:/Users/Luca/OneDrive/Documenti/Data_Engineer/Francesco/lezione file csv/amazon.csv'
 #input_path = r'C:\Users\rames\Documents\GitHub\Amazon\frontend\static\amazon.csv'
 
@@ -68,7 +67,6 @@ with open(input_path, encoding="utf-8") as f:
 
         lista_completa.append(elem)
 
-
 for elem in categorie:
     for i in elem:
         category_set.add(i)
@@ -126,11 +124,12 @@ def get_products(db):
         cursor.close()
     return products
 
-def get_products_in_utente_product(db):
+
+def cart_products(db):
     products = []
     cursor = db.cursor()
     try:
-        cursor.execute("SELECT * FROM utente_product JOIN product ON utente_product.product_ID = product.product_ID")
+        cursor.execute("SELECT * FROM utente_product")  #JOIN product ON utente_product.product_ID = product.product_ID
         products = cursor.fetchall()
     except mysql.connector.Error as err:
         print(f"Error: {err}")
@@ -138,11 +137,13 @@ def get_products_in_utente_product(db):
         cursor.close()
     return products
 
+
 def get_price_in_utente_product(db):
     products = []
     cursor = db.cursor()
     try:
-        cursor.execute("SELECT discount_price FROM utente_product JOIN product ON utente_product.product_ID = product.product_ID JOIN price ON product.price_ID = price.price_ID")
+        cursor.execute(
+            "SELECT discount_price FROM utente_product JOIN product ON utente_product.product_ID = product.product_ID JOIN price ON product.price_ID = price.price_ID")
         products = cursor.fetchall()
     except mysql.connector.Error as err:
         print(f"Error: {err}")
@@ -262,11 +263,12 @@ if __name__ == "__main__":
     insert_tuple = tuple(category_set)
     Luca.insert_query(db, "category", "category_names", insert_tuple)
     Luca.insert_query(db, "price", "discount_price, actual_price, discount_percentage", price_list)
-    Luca.insert_query(db, "product", "product_ID, product_name, description, img_link, product_link, price_ID", product_list)
+    Luca.insert_query(db, "product", "product_ID, product_name, description, img_link, product_link, price_ID",
+                      product_list)
 
     diz_category_DB = dict(Luca.select_query(db, "category", "category_names, category_ID"))
     diz_product_DB = dict(Luca.select_query(db, "product", "product_name, product_ID"))
 
-    Luca.insert_N_N(db, "category_products", "product_ID, category_ID", lista_completa, diz_category_DB, 2, diff_value=True)
+    Luca.insert_N_N(db, "category_products", "product_ID, category_ID", lista_completa, diz_category_DB, 2,
+                    diff_value=True)
     Luca.insert_query(db, "rating", "rating, rating_count, product_ID", rating_list)
-

@@ -127,17 +127,21 @@ def add_to_cart(product_id):
 def cart():
     products_list = []
     prices_list = []
+    print(session['utente_id'])
+    products_set = set()
+    for elem in data.cart_products(db):
+        if elem[2] == session['utente_id']:
+            products_list.append(elem)
+            products_set.add(elem)
+            print(elem)
 
-    for elem in data.get_products_in_utente_product(db):
-        products_list.append(elem)
     
     for elem in data.get_price_in_utente_product(db):
         prices_list.append(elem)
 
-   
     cart = session.get('cart', [])
     total = sum(item['price'] * item['quantity'] for item in cart)
-    return render_template('cart.html', cart=cart, total=total, products_list=products_list, prices_list=prices_list)
+    return render_template('cart.html', cart=cart, total=total, products_list=products_set, prices_list=prices_list)
 
 
 @app.route('/categorie')
