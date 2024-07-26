@@ -100,19 +100,7 @@ def add_to_cart(product_id):
     product_diz = {}
     username = session.get('utente_id')
     print(username)
-    """if 'cart' not in session:
-        session['cart'] = []
-
-    cart = session['cart']
     
-    for item in cart:
-        if item['id'] == product_id:
-            item['quantity'] += 1
-            break
-    else:
-        cart.append({'id': product_id, 'price': product_price, 'quantity': 1})
-    
-    session['cart'] = cart"""
     return redirect(url_for('products'))
 
 
