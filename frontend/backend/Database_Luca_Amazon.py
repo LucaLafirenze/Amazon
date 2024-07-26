@@ -222,3 +222,18 @@ def alter_table_unique(db, tabella_name, colonne):
     query = f"""ALTER TABLE {tabella_name} ADD UNIQUE ({colonne})"""
     cursor.execute(query)
     cursor.close()
+
+
+def insert_cart(db, tabella_name, colonne, elem_diz):
+    cursor = db.cursor()
+    percentuali_esse = ', '.join(['%s'] * (len(colonne.split(', '))))
+    query = f"INSERT INTO {tabella_name} ({colonne}) VALUES ({percentuali_esse})"
+    data = [(utente_id, product_id) for utente_id, product_id in elem_diz.items()]
+    try:
+        cursor.executemany(query, data)
+        db.commit()
+    except mysql.connector.Error as err:
+        print(f"Error  e: {err}")
+    finally:
+        cursor.close()
+

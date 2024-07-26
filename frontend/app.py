@@ -112,7 +112,7 @@ def add_to_cart(product_id):
 
     product_diz = {product_id: session['utente_id']}
     #product_cart = session.get('product_cart', [])
-    Luca.insert_likes(db, "utente_product", "product_ID, utente_ID", elem_diz=product_diz)
+    Luca.insert_cart(db, "utente_product", "product_ID, utente_ID", elem_diz=product_diz)
 
     """print(product_cart)
     if product_id in product_cart:
@@ -121,6 +121,12 @@ def add_to_cart(product_id):
         product_cart.append(product_id)
     session['product_cart'] = product_cart"""
     return redirect(url_for('products'))
+
+@app.route('/remove_from_cart/<string:product_id>', methods=['POST'])
+def remove_from_cart(product_id):
+    # product_diz = {product_id: session['utente_id']}
+    # Luca.delete_likes(db, "utente_product", "product_ID, utente_ID", elem_diz=product_diz)
+    return redirect(url_for('cart'))
 
 
 @app.route('/cart')
