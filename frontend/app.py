@@ -91,7 +91,6 @@ def do_signup():
         return redirect(url_for('signup'))
 
     login_signup(db, username, password)
-
     flash('Registrazione completata con successo', 'success')
     return redirect(url_for('signup'))
 
@@ -111,10 +110,9 @@ def do_login():
 
 @app.route('/add_to_cart/<string:product_id>', methods=['POST'])
 def add_to_cart(product_id):
-    print(product_id)
-    product_diz = {}
-    username = session.get('utente_id')
-    print(username)
+
+    product_diz = {product_id: session['utente_id']}
+    Luca.insert_likes(db, "utente_product", "product_ID, utente_ID", elem_diz=product_diz)
 
     return redirect(url_for('products'))
 

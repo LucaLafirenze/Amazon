@@ -190,6 +190,7 @@ def insert_likes(db, tabella_name, colonne, elem_diz):
         cursor.close()
 
 
+
 def delete_likes(db, tabella_name, colonne, elem_diz):
     cursor = db.cursor()
 

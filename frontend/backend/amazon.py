@@ -229,8 +229,8 @@ if __name__ == "__main__":
     Luca.crea_tabelle(db, "likes", "likes_ID", colonne_FK=colonne_fk, Auto_I=True)
 
     colonne_fk = {
-        "utente_ID": ("INT", "utente_amazon", "utente_ID"),
-        "product_ID": ("VARCHAR", "product", "product_ID")
+        "product_ID": ("VARCHAR", "product", "product_ID"),
+        "utente_ID": ("INT", "utente_amazon", "utente_ID")
 
     }
     Luca.crea_tabelle(db, "utente_product", "utente_product_ID", colonne_FK=colonne_fk, Auto_I=True)

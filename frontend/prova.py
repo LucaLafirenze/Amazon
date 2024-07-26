@@ -1,7 +1,7 @@
-@app.route('/like/<string:product_id>', methods=['POST'])
 def like(product_id):
     likes_diz = {}
     liked_products = session.get('liked_products', [])
+    print(liked_products)
     if product_id in liked_products:
         liked_products.remove(product_id)
         likes_diz[product_id] = session['utente_id']
