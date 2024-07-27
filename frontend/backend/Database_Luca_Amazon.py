@@ -148,10 +148,11 @@ def select_query(db, tabella_name, colonne):
 #SELECT product_ID, utente_ID FROM likes WHERE product_ID = "B002PD61Y4" AND utente_ID = 1
 def select_query_WHERE(db, tabella_name, colonne, valori):
     cursor = db.cursor()
-
     where = " AND ".join([f"{col} = %s" for col in valori.keys()])
-
-    query_select = f"SELECT {colonne} FROM {tabella_name} WHERE {where}"
+    try:
+        query_select = f"SELECT {colonne} FROM {tabella_name} WHERE {where}"
+    except mysql.connector.Error:
+        print(query_select)
 
     cursor.execute(query_select, tuple(valori.values()))
     result = cursor.fetchall()
@@ -190,8 +191,7 @@ def insert_likes(db, tabella_name, colonne, elem_diz):
         cursor.close()
 
 
-
-def delete_likes(db, tabella_name, colonne, elem_diz):
+def delete_likes(db, tabella_name, colonne, elem_diz, unique_id):
     cursor = db.cursor()
 
     data = select_query(db, tabella_name, colonne)
@@ -199,10 +199,10 @@ def delete_likes(db, tabella_name, colonne, elem_diz):
 
     if likes_tuple in data:
         conditions = {f"product_ID": f"{likes_tuple[0]}", "utente_ID": f"{likes_tuple[1]}"}
-        id_eliminare_tupla = select_query_WHERE(db, "likes", "likes_ID", conditions)
+        id_eliminare_tupla = select_query_WHERE(db, tabella_name, unique_id + ", " + colonne, conditions)
         id_eliminare = ([num[0] for num in id_eliminare_tupla])
         cursor = db.cursor()
-        query = "DELETE FROM likes WHERE likes_ID = %s"
+        query = f"DELETE FROM {tabella_name} WHERE {unique_id} = %s"
         cursor.execute(query, (id_eliminare[0],))
 
     db.commit()

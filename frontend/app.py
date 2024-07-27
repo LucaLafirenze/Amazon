@@ -48,7 +48,8 @@ def like(product_id):
     if product_id in liked_products:
         liked_products.remove(product_id)
         likes_diz[product_id] = session['utente_id']
-        Luca.delete_likes(db, "likes", "product_ID, utente_ID", elem_diz=likes_diz)
+        Luca.delete_likes(db, "likes", "product_ID, utente_ID", elem_diz=likes_diz,
+                          unique_id="likes_ID")
     else:
         liked_products.append(product_id)
         likes_diz[product_id] = session['utente_id']
@@ -111,7 +112,6 @@ def do_login():
 def add_to_cart(product_id):
 
     product_diz = {product_id: session['utente_id']}
-    #product_cart = session.get('product_cart', [])
     Luca.insert_cart(db, "utente_product", "product_ID, utente_ID", elem_diz=product_diz)
 
     """print(product_cart)
@@ -122,10 +122,12 @@ def add_to_cart(product_id):
     session['product_cart'] = product_cart"""
     return redirect(url_for('products'))
 
+
 @app.route('/remove_from_cart/<string:product_id>', methods=['POST'])
 def remove_from_cart(product_id):
-    # product_diz = {product_id: session['utente_id']}
-    # Luca.delete_likes(db, "utente_product", "product_ID, utente_ID", elem_diz=product_diz)
+    product_diz = {product_id: session['utente_id']}
+    Luca.delete_likes(db, "utente_product", "product_ID, utente_ID", elem_diz=product_diz,
+                      unique_id="utente_product_ID")
     return redirect(url_for('cart'))
 
 
@@ -133,21 +135,38 @@ def remove_from_cart(product_id):
 def cart():
     products_list = []
     prices_list = []
-    print(session['utente_id'])
-    products_set = set()
+    products_id_set = set()
+    dizionario_quantity = {}
+    products_info = []
+    products_finale = []
     for elem in data.cart_products(db):
         if elem[2] == session['utente_id']:
-            products_list.append(elem)
-            products_set.add(elem)
-            print(elem)
+            products_list.append(elem[1])
+            products_id_set.add(elem[1])
+            products_info.append(elem)
 
-    
+    #print(products_id_set)
+    #print(products_list)
+    for elem_id in products_list:
+        if elem_id not in dizionario_quantity:
+            dizionario_quantity[elem_id] = 1
+        else:
+            dizionario_quantity[elem_id] += 1
+    #print(dizionario_quantity)
     for elem in data.get_price_in_utente_product(db):
-        prices_list.append(elem)
+        if elem[2] == session['utente_id']:
 
+            sublist = elem[1], elem[-2], dizionario_quantity[elem[1]]
+            if sublist not in prices_list:
+                prices_list.append(sublist)
+    for elem in products_id_set:
+        valori = {"product_ID": elem}
+        GG = Luca.select_query_WHERE(db, "product", "product_ID, product_name, img_link", valori)
+        products_finale.append(GG)
     cart = session.get('cart', [])
-    total = sum(item['price'] * item['quantity'] for item in cart)
-    return render_template('cart.html', cart=cart, total=total, products_list=products_set, prices_list=prices_list)
+    total = None
+    return render_template('cart.html', cart=cart, total=total, products_list=products_finale,
+                           prices_list=prices_list, products_info=products_info)
 
 
 @app.route('/categorie')
